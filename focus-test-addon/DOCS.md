@@ -9,6 +9,10 @@ It uses port **7655** and does not migrate or overwrite your existing dashboard.
    and the test app discoverable. The original owner's repository is unaffected.
 3. In GitHub Actions choose **Build focus-mode test image**, select this branch,
    and run the workflow. Wait for the multi-platform build to succeed.
+   Do not select **Publish Docker image**: that inherited workflow publishes the
+   original owner's GHCR image and is intentionally skipped in forks.
+   After a failed GHCR run, start a new focus-mode workflow run rather than
+   rerunning the old failure (which uses the old workflow revision).
 4. Create the public `kwintend/ancienthomeassistant` repository on Docker Hub.
    The workflow reads `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` from repository
    Actions secrets; the token needs Read & Write permission. Home Assistant must

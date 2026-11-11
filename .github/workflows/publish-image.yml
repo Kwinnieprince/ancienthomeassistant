@@ -22,6 +22,8 @@ concurrency:
 
 jobs:
   test:
+    # Forks use focus-test.yml with their own Docker Hub credentials.
+    if: github.repository == 'leodenglovescode/ancienthomeassistant'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -36,6 +38,7 @@ jobs:
         run: python -m unittest discover -s tests -v
 
   publish:
+    if: github.repository == 'leodenglovescode/ancienthomeassistant'
     needs: test
     runs-on: ubuntu-latest
     permissions:
