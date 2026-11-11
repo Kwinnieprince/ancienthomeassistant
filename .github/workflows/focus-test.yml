@@ -1,6 +1,8 @@
 name: Build focus-mode test image
 
 on:
+  push:
+    branches: [feat/dashboard-focus-mode]
   workflow_dispatch:
 
 permissions:
