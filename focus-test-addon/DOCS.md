@@ -9,8 +9,11 @@ It uses port **7655** and does not migrate or overwrite your existing dashboard.
    and the test app discoverable. The original owner's repository is unaffected.
 3. In GitHub Actions choose **Build focus-mode test image**, select this branch,
    and run the workflow. Wait for the multi-platform build to succeed.
-4. Ensure the GHCR package `ancienthomeassistant` is publicly readable so Home
-   Assistant can pull it without credentials. Do not put credentials in this repo.
+4. Create the public `kwintend/ancienthomeassistant` repository on Docker Hub.
+   The workflow reads `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` from repository
+   Actions secrets; the token needs Read & Write permission. Home Assistant must
+   be able to pull the image without credentials. Do not put tokens in this repo.
+   The test app pulls `docker.io/kwintend/ancienthomeassistant:focus-test`.
 5. Add `https://github.com/Kwinnieprince/ancienthomeassistant` to the HA app store.
    Alternatively, copy `focus-test-addon` into HA's local `/addons` directory and
    refresh the app store. Do not change the original author's default branch.
