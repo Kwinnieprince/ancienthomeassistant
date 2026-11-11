@@ -186,7 +186,7 @@ class BridgeTests(unittest.TestCase):
         self.assertNotIn(b'Sample data', html)
         for path in ('/api/states', '/api/config', '/api/entities', '/api/connection', '/api/camera/camera.test'):
             self.assertEqual(self.call('GET', path)[0], 401, path)
-        for path in ('/', '/app.js', '/style.css', '/assets/camera-placeholder.svg', '/assets/touch-icon.png'):
+        for path in ('/', '/app.js', '/navigation.js', '/style.css', '/assets/camera-placeholder.svg', '/assets/touch-icon.png'):
             self.assertEqual(self.call('GET', path)[0], 200, path)
         self.assertEqual(self.call('GET', '/assets/front-door.svg')[0], 404)
         for path in ('/../server.py', '/%2e%2e/storage.py', '/../data/dashboard.sqlite3'):

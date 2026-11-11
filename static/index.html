@@ -16,6 +16,8 @@
 <body>
   <main id="access" class="access"><div id="accessBody" class="access-card"><img class="access-logo" src="assets/icon.svg" width="58" height="58" alt="Ancient Home Assistant"><h1>Opening your dashboard…</h1></div></main>
   <div id="app" hidden>
+    <button id="navigationToggle" class="navigation-toggle" aria-label="Show navigation" aria-expanded="false" aria-controls="sidebar topbar" hidden><span data-icon="menu"></span></button>
+    <button id="navigationBackdrop" class="navigation-backdrop" aria-label="Close navigation" hidden></button>
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="#overview"><span class="brand-icon"><img src="assets/icon.svg" width="32" height="32" alt="Ancient Home Assistant logo"></span><span>ancient home<small>ASSISTANT</small></span></a>
       <div class="nav-caption">YOUR HOME</div>
@@ -29,13 +31,14 @@
       <div class="sidebar-bottom"><div class="home-status"><i></i><span id="sidebarStatus">Connecting…</span></div><button class="nav-item" id="settingsButton"><span data-icon="settings"></span>Settings</button></div>
     </aside>
     <div class="shell">
-      <header class="topbar"><button class="icon-button menu-button" id="menuButton" aria-label="Open navigation"><span data-icon="menu"></span></button><span class="breadcrumb">Your home <span>/</span> <strong id="viewTitle">Overview</strong></span><div class="top-actions"><span class="connection-pill" id="connectionBadge">Connecting…</span><button class="secondary-button edit-button" id="editButton">Edit dashboard</button><button class="icon-button" id="themeButton" aria-label="Switch to dark theme"><span data-icon="moon"></span></button><button class="icon-button" id="refreshButton" aria-label="Refresh dashboard"><span data-icon="refresh"></span></button></div></header>
+      <header class="topbar" id="topbar"><button class="icon-button menu-button" id="menuButton" aria-label="Open navigation"><span data-icon="menu"></span></button><span class="breadcrumb">Your home <span>/</span> <strong id="viewTitle">Overview</strong></span><div class="top-actions"><span class="connection-pill" id="connectionBadge">Connecting…</span><button class="secondary-button edit-button" id="editButton">Edit dashboard</button><button class="icon-button" id="themeButton" aria-label="Switch to dark theme"><span data-icon="moon"></span></button><button class="icon-button" id="refreshButton" aria-label="Refresh dashboard"><span data-icon="refresh"></span></button></div></header>
       <main class="dashboard-main"><section class="welcome"><div><div class="eyebrow" id="dateLabel"></div><h1 id="greeting"></h1><p>Your home. The way you want to see it.</p></div><div class="welcome-clock"><span id="clock">--:--</span><small>Home sweet home</small></div></section><div class="view-tabs" role="tablist" aria-label="Dashboard view"><button class="active" data-tab="overview" role="tab" aria-selected="true"><span data-icon="home"></span>Home</button><button data-tab="lights" role="tab" aria-selected="false">Lights</button><button data-tab="cameras" role="tab" aria-selected="false">Cameras</button><button data-tab="climate" role="tab" aria-selected="false">Climate</button><span class="updated" id="updatedLabel"></span></div><div id="dashboard"></div><footer><span data-icon="home"></span>Ancient hardware. A smarter home.</footer></main>
     </div>
   </div>
   <div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" tabindex="-1"><div class="modal-head"><h2 id="modalTitle"></h2><button class="icon-button" id="closeModal" aria-label="Close dialog"><span data-icon="close"></span></button></div><div id="modalBody"></div></section></div>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <noscript>Enable JavaScript in Safari to set up and use this dashboard.</noscript>
+  <script src="navigation.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -8,6 +8,17 @@
 
 Home Assistant-style widgets in a lightweight frontend targeting iPad 2 and iOS 9 Safari. A Python bridge handles authentication, entity discovery, and persistent dashboard settings. No frontend framework, CDN, package installation, or JavaScript build step is required.
 
+## Focus-mode test branch
+
+This branch adds per-browser **Hide sidebar** and **Hide top bar** settings.
+A persistent corner button brings the hidden navigation back as an overlay.
+Navigation closes after choosing a view or tapping outside; editing temporarily
+restores the normal layout. Preferences are saved only in this browser.
+
+See the [isolated test app instructions](focus-test-addon/DOCS.md) for an ARM64
+image workflow and a separate HA test app on port 7655. This feature branch starts
+from `main` and does not include the separate add-on PR.
+
 ## Set up a real dashboard
 
 A fresh installation opens onboarding, not a demo:

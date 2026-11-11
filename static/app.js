@@ -43,6 +43,7 @@
   var pickerContext = null, pickerGeneration = 0, pickerOffset = 0, pickerTotal = 0, pickerTimer;
   var cameraCard = null, cameraMode = 'snapshot', cameraTimer, cameraGeneration = 0, cameraBusy = false, focusBefore;
   var modalKind = '', resizeTimer, lastColumns = 0;
+  var navigation = new window.AncientNavigation(byId('app'), byId('sidebar'), byId('navigationToggle'), byId('navigationBackdrop'), recall, store);
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
   function uid(prefix) { return prefix + new Date().getTime().toString(36) + Math.random().toString(36).slice(2, 9); }
   function request(method, url, data, done) {
@@ -182,7 +183,7 @@
   }
   function removeCard(id) { each(draft.sections, function (section) { section.cards = section.cards.filter(function (card) { return card.id !== id; }); }); }
   function move(list, index, amount) { var target = index + amount; if (target < 0 || target >= list.length) { return; } var item = list.splice(index, 1)[0]; list.splice(target, 0, item); }
-  function openEditor() { editing = true; draft = clone(config); byId('viewTitle').textContent = 'Edit dashboard'; byId('dashboard').innerHTML = '<div id="builder"></div>'; renderBuilder(); window.scrollTo(0, 0); }
+  function openEditor() { editing = true; navigation.setEditing(true); draft = clone(config); byId('viewTitle').textContent = 'Edit dashboard'; byId('dashboard').innerHTML = '<div id="builder"></div>'; renderBuilder(); window.scrollTo(0, 0); }
   function renderBuilder() {
     if (!byId('builder')) { return; }
     var html = '<div class="editor-heading"><div><label for="boardTitle">Dashboard title</label><input id="boardTitle" type="text" maxlength="100" value="' + esc(draft.title) + '"></div><div><label for="boardColumns">Maximum columns</label><select id="boardColumns">' + fieldOptions([['1', 'One'], ['2', 'Two'], ['3', 'Three']], draft.columns) + '</select></div></div>';
@@ -278,10 +279,11 @@
     each(document.querySelectorAll('[data-tab]'), function (b) { var selected = b.getAttribute('data-tab') === view; b.className = selected ? 'active' : ''; b.setAttribute('aria-selected', String(selected)); });
   }
   function render() {
+    navigation.setEditing(editing);
     if (!config || editing || !byId('access').hidden) { return; }
     updateHeader(); byId('dashboard').innerHTML = view === 'activity' ? activityHtml() : boardHtml(); bindWidgets(); refreshCameras();
   }
-  function go(next) { if (editing) { notify('Save or cancel your layout changes first.'); return; } view = ['overview', 'lights', 'cameras', 'climate', 'activity'].indexOf(next) >= 0 ? next : 'overview'; byId('sidebar').className = 'sidebar'; render(); window.scrollTo(0, 0); }
+  function go(next) { if (editing) { notify('Save or cancel your layout changes first.'); return; } view = ['overview', 'lights', 'cameras', 'climate', 'activity'].indexOf(next) >= 0 ? next : 'overview'; navigation.close(); render(); window.scrollTo(0, 0); }
   function service(card, action, extra, done) {
     if (!ready(states[card.entity]) || busy[card.id]) { return; }
     busy[card.id] = true; var payload = { entity_id: card.entity, domain: card.entity.split('.')[0], service: action };
@@ -341,8 +343,11 @@
   function openCamera(card) { var html = '<div id="cameraContent"></div><label for="cameraMode">Viewing mode</label><select id="cameraMode">' + fieldOptions([['snapshot', 'Snapshots · low load'], ['mjpeg', 'MJPEG · if supported']].concat(card.stream_url ? [['video', 'Native HLS / MP4 video']] : []), 'snapshot') + '</select><p id="cameraStatus" class="form-note" role="status"></p>'; openModal(card.title, html, 'camera'); cameraCard = card; cameraMode = 'snapshot'; cameraContent(); byId('cameraMode').onchange = function () { cameraMode = this.value; cameraContent(); }; }
   function showSettings() {
     if (!authenticated || editing) { if (editing) { notify('Save or cancel your layout changes first.'); } return; }
-    var html = '<button id="settingsEdit" class="primary-button">Customize dashboard &amp; widgets</button><h3 class="mapping-heading">Home Assistant connection</h3><p class="form-note">Saved on the server. Leave the token blank to retain it when the address is unchanged.</p><form id="connectionForm"><label for="connectionUrl">Home Assistant URL</label><input id="connectionUrl" type="url" required autocomplete="off"><label for="connectionToken">Replacement long-lived access token</label><input id="connectionToken" type="password" autocomplete="off"><p id="connectionError" class="form-note" role="status"></p><button id="connectionSave" class="secondary-button" type="submit">Update connection</button></form><h3 class="mapping-heading">Dashboard password</h3><form id="passwordForm"><label for="currentPassword">Current password</label><input id="currentPassword" type="password" required autocomplete="current-password"><label for="newPassword">New password</label><input id="newPassword" type="password" required minlength="10" maxlength="256" autocomplete="new-password"><p class="form-note">Changing the password signs out other browsers.</p><p id="passwordError" class="form-note" role="status"></p><button id="passwordSave" class="secondary-button" type="submit">Change password</button></form><h3 class="mapping-heading">This browser</h3><button id="logoutButton" class="secondary-button">Sign out</button>';
-    openModal('Settings', html, 'settings'); request('GET', '/api/connection', null, function (error, result) { if (!byId('connectionUrl')) { return; } if (error) { formError('connectionError', error); } else { byId('connectionUrl').value = result.url; } });
+    var html = '<button id="settingsEdit" class="primary-button">Customize dashboard &amp; widgets</button><h3 class="mapping-heading">Home Assistant connection</h3><p class="form-note">Saved on the server. Leave the token blank to retain it when the address is unchanged.</p><form id="connectionForm"><label for="connectionUrl">Home Assistant URL</label><input id="connectionUrl" type="url" required autocomplete="off"><label for="connectionToken">Replacement long-lived access token</label><input id="connectionToken" type="password" autocomplete="off"><p id="connectionError" class="form-note" role="status"></p><button id="connectionSave" class="secondary-button" type="submit">Update connection</button></form><h3 class="mapping-heading">Dashboard password</h3><form id="passwordForm"><label for="currentPassword">Current password</label><input id="currentPassword" type="password" required autocomplete="current-password"><label for="newPassword">New password</label><input id="newPassword" type="password" required minlength="10" maxlength="256" autocomplete="new-password"><p class="form-note">Changing the password signs out other browsers.</p><p id="passwordError" class="form-note" role="status"></p><button id="passwordSave" class="secondary-button" type="submit">Change password</button></form><h3 class="mapping-heading">This browser</h3><p class="form-note">Hide navigation for more dashboard space. Use the menu button in the corner to bring it back. These preferences apply only to this browser.</p><label class="navigation-option"><input type="checkbox" id="hideSidebar"> Hide sidebar</label><label class="navigation-option"><input type="checkbox" id="hideTopbar"> Hide top bar</label><button id="logoutButton" class="secondary-button">Sign out</button>';
+    navigation.close(); openModal('Settings', html, 'settings'); request('GET', '/api/connection', null, function (error, result) { if (!byId('connectionUrl')) { return; } if (error) { formError('connectionError', error); } else { byId('connectionUrl').value = result.url; } });
+    var navigationPrefs = navigation.preferences();
+    byId('hideSidebar').checked = navigationPrefs.sidebar; byId('hideTopbar').checked = navigationPrefs.topbar;
+    byId('hideSidebar').onchange = byId('hideTopbar').onchange = function () { navigation.configure(byId('hideSidebar').checked, byId('hideTopbar').checked); };
     byId('settingsEdit').onclick = function () { closeModal(); openEditor(); }; byId('logoutButton').onclick = logout;
     byId('connectionForm').onsubmit = function (event) { event.preventDefault(); var payload = { url: byId('connectionUrl').value, token: byId('connectionToken').value }; byId('connectionToken').value = ''; byId('connectionSave').disabled = true; request('POST', '/api/connection', payload, function (error) { if (!byId('connectionSave')) { return; } byId('connectionSave').disabled = false; if (error) { formError('connectionError', error); } else { closeModal(); lastSignature = ''; poll(); notify('Home Assistant connection updated.'); } }); };
     byId('passwordForm').onsubmit = function (event) { event.preventDefault(); var payload = { current_password: byId('currentPassword').value, password: byId('newPassword').value }; byId('currentPassword').value = ''; byId('newPassword').value = ''; byId('passwordSave').disabled = true; request('POST', '/api/password', payload, function (error) { if (!byId('passwordSave')) { return; } byId('passwordSave').disabled = false; if (error) { formError('passwordError', error); } else { closeModal(); notify('Dashboard password updated. Other browsers are signed out.'); } }); };
@@ -353,7 +358,9 @@
   function applyTheme() { document.documentElement.className = dark ? 'dark' : ''; byId('themeButton').innerHTML = icon(dark ? 'sun' : 'moon'); byId('themeButton').setAttribute('aria-label', 'Switch to ' + (dark ? 'light' : 'dark') + ' theme'); }
   fillIcons(); applyTheme(); tick();
   byId('themeButton').onclick = function () { dark = !dark; store('dark', dark); applyTheme(); };
-  byId('menuButton').onclick = function () { byId('sidebar').className = byId('sidebar').className === 'sidebar open' ? 'sidebar' : 'sidebar open'; };
+  byId('menuButton').onclick = byId('navigationToggle').onclick = function () { navigation.toggle(); };
+  byId('navigationBackdrop').onclick = function () { navigation.close(); if (!byId('navigationToggle').hidden) { byId('navigationToggle').focus(); } };
+  document.addEventListener('keydown', function (event) { if (event.keyCode === 27) { navigation.close(); } });
   byId('editButton').onclick = function () { if (!editing) { openEditor(); } };
   byId('settingsButton').onclick = showSettings; byId('closeModal').onclick = closeModal;
   byId('modalBackdrop').onclick = function (event) { if (event.target === this) { closeModal(); } };
