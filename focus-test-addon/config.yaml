@@ -1,0 +1,18 @@
+name: Ancient Dashboard Focus Test
+version: "0.1.0-focus.1"
+slug: ancient_dashboard_focus_test
+description: Separate test dashboard with collapsible navigation.
+url: https://github.com/Kwinnieprince/ancienthomeassistant/tree/feat/dashboard-focus-mode
+arch:
+  - aarch64
+  - amd64
+startup: application
+boot: manual
+stage: experimental
+init: true
+webui: "http://[HOST]:[PORT:8095]"
+watchdog: "http://[HOST]:[PORT:8095]/api/status"
+ports:
+  8095/tcp: 7655
+options: {}
+schema: {}
